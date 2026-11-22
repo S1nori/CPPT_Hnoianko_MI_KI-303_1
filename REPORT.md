@@ -36,18 +36,20 @@
 * **Система збирання:** Apache Maven (конфігурація у `pom.xml`, Java 21, кодування `UTF-8`) із Maven Wrapper (`mvnw`, `mvnw.cmd`) для відтворюваної збірки без попередньо встановленого Maven.
 * **Тестування:** JUnit Jupiter `5.12.2` (`maven-surefire-plugin 3.5.2`).
 * **Статичний аналіз:** `spotbugs-maven-plugin 4.9.7.0`, прив'язаний до фази `verify`.
-* **Пакування та версіонування:** `maven-shade-plugin 3.6.0` (фаза `package`) створює виконуваний `target/lab01-1.0.0.jar` із `Main-Class: ua.lpnu.kzp.Main`. Фільтрування ресурсів підставляє `${project.version}` (`1.0.0`) і `${build.number}` (`local` локально або `${{ github.run_number }}` у CI).
-* **CI/CD та артефакти:** `.github/workflows/ci.yml` запускає `verify package` і перевірку JAR на `ubuntu-latest`, `windows-latest`, `macos-latest` та публікує артефакти `jar-<os>-<run_number>`.
+* **Пакування та версіонування:** `maven-shade-plugin 3.6.0` (фаза `package`) створює виконуваний `target/lab01-1.0.0.jar` із `Main-Class: ua.lpnu.kzp.Main`. Фільтрування ресурсів підставляє `${project.version}` (`1.0.0`) і `${build.number}` (`local` локально або `${{ github.run_number }}` у CI, наприклад `1.0.0+5`).
+* **CI/CD та артефакти:** `.github/workflows/ci.yml` запускає `verify package` і перевірку JAR на `ubuntu-latest`, `windows-latest`, `macos-latest` та публікує артефакти `jar-ubuntu-latest-5`, `jar-windows-latest-5`, `jar-macos-latest-5`.
 * **Git-тег релізу:** `v1.0.0`.
-* **Посилання на запуск CI та артефакт:** `<вставити посилання на успішний workflow run та артефакт у GitHub Actions після пушу>`.
+* **Посилання на запуск CI та артефакти:** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/actions/runs/45018258931
 
 ## 6. GitHub Issues і Pull Request
 | № Issue | Назва завдання | Мітка | Зміна / PR |
 | :--- | :--- | :--- | :--- |
-| `#1` | Налаштування лабораторної роботи № 1 та Maven-інфраструктури | `infra` | `pom.xml`, Maven Wrapper, `.github/workflows/ci.yml` |
-| `#2` | Реалізація читання та валідації записів реєстру студентів | `feature` | `CsvReader.java`, `DataValidator.java`, тести |
-| `#3` | Обчислення показників варіанта 6 та формування консольного і файлового звіту | `feature` | `StudentReportService.java`, `Main.java`, `BuildInfo.java` |
-| `#4` | Документація проєкту та звіт | `docs` | `README.md`, `REPORT.md`, `ai/*.md`, Javadoc (`Closes #1, Closes #2, Closes #3, Closes #4`) |
+| `#1` | Налаштувати Maven-проєкт | `infra` | `pom.xml`, Maven Wrapper, структура каталогів |
+| `#2` | Налаштувати аналізатор і пакування | `infra` | `spotbugs-maven-plugin`, `maven-shade-plugin`, `BuildInfo.java` |
+| `#3` | Налаштувати GitHub Actions | `infra` | `.github/workflows/ci.yml`, матриця 3 ОС, артефакти JAR |
+| `#4` | Реалізувати читання й перевірку записів | `feature` | `CsvReader.java`, `DataValidator.java`, модульні тести |
+| `#5` | Сформувати звіт | `feature` | `StudentReportService.java`, `Main.java`, консольний та файловий звіт |
+| `#6` | Додати документацію | `docs` | `README.md`, `REPORT.md`, `ai/*.md`, Javadoc (`Closes #1, Closes #2, Closes #3, Closes #4, Closes #5, Closes #6`) |
 
 ## 7. Приклади роботи
 ### Вхідні дані (`data/input.csv`)
@@ -82,7 +84,7 @@ $ java -jar target/lab01-1.0.0.jar --version
 ## 8. Тестування
 * Локально виконано `.\mvnw.cmd clean verify package` — успішно виконано 14 модульних та інтеграційних тестів (`CsvReaderTest`, `DataValidatorTest`, `StudentReportServiceTest`, `MainTest`), перевірку SpotBugs та складання виконуваного JAR (`BUILD SUCCESS`).
 * Перевірено коректні записи з українськими символами, порожні рядки, неправильну кількість полів, порожні обов'язкові поля, нечислові значення, від'ємний бал, некоректний курс, хибне булеве поле, порожній набір коректних записів і запис звіту у файл.
-* Посилання на результати GitHub Actions на трьох ОС (`ubuntu-latest`, `windows-latest`, `macos-latest`): `<вставити посилання на GitHub Actions після пушу>`.
+* Посилання на результати GitHub Actions на трьох ОС (`ubuntu-latest`, `windows-latest`, `macos-latest`): https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/actions/runs/45018258931
 
 ## 9. Документація
 * У `README.md` описано призначення програми, формат CSV для варіанта 6, перелік показників, команди збирання й запуску та приклад роботи.
