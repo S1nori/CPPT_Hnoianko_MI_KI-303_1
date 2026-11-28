@@ -97,3 +97,10 @@
 
 ## 12. Висновки
 Під час виконання лабораторної роботи № 2 рядкову обробку даних із попередньої роботи успішно замінено об'єктно-орієнтованою моделлю предметної області: створено незмінний клас-сутність `Student` із перевіркою інваріантів у конструкторі та фабричним методом `fromCsv`, а також допоміжний `record GradeScholarship`. Повне проходження 21 тесту JUnit 5, статичного аналізу SpotBugs та ідентичність вихідного звіту підтверджують збереження зовнішньої поведінки продукту і готують проєкт до впровадження ієрархії типів та поліморфізму в лабораторній роботі № 3.
+
+## Основні посилання
+- **GitHub-репозиторій:** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1
+- **Pull Request #12:** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/pull/12
+- **GitHub Issues (#8–#11):** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/issues?q=is%3Aissue+is%3Aclosed
+- **GitHub Actions (CI та JAR-артефакти):** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/actions/runs/46165741568
+- **Релізний Git-тег `v1.1.0`:** https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/tree/v1.1.0
