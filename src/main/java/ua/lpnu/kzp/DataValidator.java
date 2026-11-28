@@ -6,56 +6,64 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Validates student registry CSV records according to Variant 6 rules.
- * Expected format: {@code name;group;course;average;scholarship}.
+ * Validates student registry CSV records using {@link Student#fromCsv(String)}.
  */
 public final class DataValidator {
-
-    private static final String DELIMITER = ";";
-    private static final int EXPECTED_FIELDS = 5;
 
     private DataValidator() {
     }
 
     /**
-     * Immutable container holding valid CSV lines and human-readable validation errors.
+     * Immutable container holding valid {@link Student} objects and validation errors.
      *
-     * @param validLines list of lines that passed all validation checks
-     * @param errors     list of error descriptions with 1-based line numbers
+     * @param validStudents list of validated student entities
+     * @param errors        list of error descriptions with 1-based line numbers
      */
-    public record ValidationResult(List<String> validLines, List<String> errors) {
+    public record ValidationResult(List<Student> validStudents, List<String> errors) {
 
         /**
          * Creates defensive immutable copies of the provided lists.
          */
         public ValidationResult {
-            validLines = List.copyOf(validLines);
+            validStudents = List.copyOf(validStudents);
             errors = List.copyOf(errors);
+        }
+
+        /**
+         * Preserves backward compatibility with Lab 01 tests expecting valid line count/list.
+         *
+         * @return list of formatted string representations for valid students
+         */
+        public List<String> validLines() {
+            return validStudents.stream().map(Student::toString).toList();
         }
     }
 
     /**
-     * Validates all CSV lines and separates valid records from error messages.
+     * Validates all CSV lines and separates valid {@link Student} records from error messages.
      *
      * @param lines raw lines read from the input CSV file
-     * @return {@link ValidationResult} containing valid lines and validation errors
+     * @return {@link ValidationResult} containing valid students and validation errors
      */
     public static ValidationResult validateAll(List<String> lines) {
         Objects.requireNonNull(lines, "lines must not be null");
-        List<String> validLines = new ArrayList<>();
+        List<Student> validStudents = new ArrayList<>();
         List<String> errors = new ArrayList<>();
 
         for (int i = 0; i < lines.size(); i++) {
             int lineNumber = i + 1;
             String line = lines.get(i);
-            Optional<String> error = validateLine(line, lineNumber);
-            if (error.isPresent()) {
-                errors.add(error.get());
-            } else {
-                validLines.add(line);
+            if (line == null) {
+                errors.add("Рядок %d: порожній рядок".formatted(lineNumber));
+                continue;
+            }
+            try {
+                validStudents.add(Student.fromCsv(line));
+            } catch (IllegalArgumentException exception) {
+                errors.add("Рядок %d: %s".formatted(lineNumber, exception.getMessage()));
             }
         }
-        return new ValidationResult(validLines, errors);
+        return new ValidationResult(validStudents, errors);
     }
 
     /**
@@ -66,50 +74,14 @@ public final class DataValidator {
      * @return {@link Optional} containing the error message if invalid, or empty if valid
      */
     public static Optional<String> validateLine(String line, int lineNumber) {
-        if (line == null || line.isBlank()) {
+        if (line == null) {
             return Optional.of("Рядок %d: порожній рядок".formatted(lineNumber));
         }
-
-        String[] fields = line.split(DELIMITER, -1);
-        if (fields.length != EXPECTED_FIELDS) {
-            return Optional.of(
-                    "Рядок %d: очікується %d полів, отримано %d"
-                            .formatted(lineNumber, EXPECTED_FIELDS, fields.length));
-        }
-
-        String name = fields[0].trim();
-        String group = fields[1].trim();
-        if (name.isEmpty() || group.isEmpty()) {
-            return Optional.of(
-                    "Рядок %d: порожнє обов'язкове текстове поле (ПІБ або група)"
-                            .formatted(lineNumber));
-        }
-
         try {
-            int course = Integer.parseInt(fields[2].trim());
-            double average = Double.parseDouble(fields[3].trim());
-
-            if (course <= 0) {
-                return Optional.of(
-                        "Рядок %d: номер курсу має бути додатним цілим числом"
-                                .formatted(lineNumber));
-            }
-            if (Double.isNaN(average) || Double.isInfinite(average) || average < 0.0) {
-                return Optional.of(
-                        "Рядок %d: середній бал не може бути від'ємним".formatted(lineNumber));
-            }
-        } catch (NumberFormatException exception) {
-            return Optional.of(
-                    "Рядок %d: числове поле має помилковий формат".formatted(lineNumber));
+            Student.fromCsv(line);
+            return Optional.empty();
+        } catch (IllegalArgumentException exception) {
+            return Optional.of("Рядок %d: %s".formatted(lineNumber, exception.getMessage()));
         }
-
-        String scholarshipRaw = fields[4].trim();
-        if (!"true".equalsIgnoreCase(scholarshipRaw)
-                && !"false".equalsIgnoreCase(scholarshipRaw)) {
-            return Optional.of(
-                    "Рядок %d: поле стипендії має бути true або false".formatted(lineNumber));
-        }
-
-        return Optional.empty();
     }
 }

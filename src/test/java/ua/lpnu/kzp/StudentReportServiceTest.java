@@ -1,6 +1,7 @@
 package ua.lpnu.kzp;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -16,13 +17,13 @@ class StudentReportServiceTest {
 
     @Test
     void calculateComputesVariant6MetricsAccurately() {
-        List<String> validLines = List.of(
-                "Іван Петренко;КІ-301;3;87.5;true",
-                "Марія Коваль;КІ-302;3;92.0;false",
-                "Олег Шевченко;КІ-301;2;76.5;true",
-                "Анастасія Бондар;КІ-306;3;82.0;false");
+        List<Student> students = List.of(
+                Student.fromCsv("Іван Петренко;КІ-301;3;87.5;true"),
+                Student.fromCsv("Марія Коваль;КІ-302;3;92.0;false"),
+                Student.fromCsv("Олег Шевченко;КІ-301;2;76.5;true"),
+                Student.fromCsv("Анастасія Бондар;КІ-306;3;82.0;false"));
 
-        StudentMetrics metrics = StudentReportService.calculate(validLines);
+        StudentMetrics metrics = StudentReportService.calculate(students);
         assertEquals(4, metrics.validCount());
         assertEquals(84.50, metrics.averageScore(), 0.0001);
         assertEquals(92.00, metrics.maxScore(), 0.0001);
@@ -37,8 +38,14 @@ class StudentReportServiceTest {
         assertEquals(0.0, metrics.maxScore(), 0.0001);
         assertEquals(0, metrics.scholarshipCount());
 
-        String report = StudentReportService.formatReport(metrics, List.of("Рядок 1: порожній рядок"));
+        String report = StudentReportService.formatReport(
+                metrics, List.of("Рядок 1: порожній рядок"));
         assertTrue(report.contains("Увага: коректних записів не знайдено."));
+    }
+
+    @Test
+    void calculateRejectsNullStudentList() {
+        assertThrows(NullPointerException.class, () -> StudentReportService.calculate(null));
     }
 
     @Test

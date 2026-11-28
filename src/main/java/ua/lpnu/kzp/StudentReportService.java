@@ -9,11 +9,10 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Calculates student registry metrics for Variant 6 and formats/writes reports.
+ * Calculates student registry metrics for Variant 6 from {@link Student} entities
+ * and formats/writes reports.
  */
 public final class StudentReportService {
-
-    private static final String DELIMITER = ";";
 
     private StudentReportService() {
     }
@@ -34,34 +33,30 @@ public final class StudentReportService {
     }
 
     /**
-     * Computes the four Variant 6 metrics from validated CSV lines.
+     * Computes the four Variant 6 metrics from validated {@link Student} records.
      *
-     * @param validLines list of validated records in format {@code name;group;course;average;scholarship}
+     * @param students list of validated student entities
      * @return computed {@link StudentMetrics}
      */
-    public static StudentMetrics calculate(List<String> validLines) {
-        Objects.requireNonNull(validLines, "validLines must not be null");
+    public static StudentMetrics calculate(List<Student> students) {
+        Objects.requireNonNull(students, "students must not be null");
 
-        int validCount = 0;
+        if (students.isEmpty()) {
+            return new StudentMetrics(0, 0.0, 0.0, 0);
+        }
+
+        int validCount = students.size();
         double totalScore = 0.0;
         double maxScore = Double.NEGATIVE_INFINITY;
         int scholarshipCount = 0;
 
-        for (String line : validLines) {
-            String[] fields = line.split(DELIMITER, -1);
-            double score = Double.parseDouble(fields[3].trim());
-            boolean scholarship = Boolean.parseBoolean(fields[4].trim());
-
-            validCount++;
-            totalScore += score;
-            maxScore = Math.max(maxScore, score);
-            if (scholarship) {
+        for (Student student : students) {
+            GradeScholarship entry = student.toGradeScholarship();
+            totalScore += entry.average();
+            maxScore = Math.max(maxScore, entry.average());
+            if (entry.scholarship()) {
                 scholarshipCount++;
             }
-        }
-
-        if (validCount == 0) {
-            return new StudentMetrics(0, 0.0, 0.0, 0);
         }
 
         double averageScore = totalScore / validCount;
