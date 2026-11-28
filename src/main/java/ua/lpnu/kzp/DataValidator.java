@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * Validates student registry CSV records according to Variant 6 rules.
- * Expected format: {@code group;name;average;course;scholarship}.
+ * Expected format: {@code name;group;course;average;scholarship}.
  */
 public final class DataValidator {
 
@@ -77,26 +77,26 @@ public final class DataValidator {
                             .formatted(lineNumber, EXPECTED_FIELDS, fields.length));
         }
 
-        String group = fields[0].trim();
-        String name = fields[1].trim();
-        if (group.isEmpty() || name.isEmpty()) {
+        String name = fields[0].trim();
+        String group = fields[1].trim();
+        if (name.isEmpty() || group.isEmpty()) {
             return Optional.of(
-                    "Рядок %d: порожнє обов'язкове текстове поле (група або ПІБ)"
+                    "Рядок %d: порожнє обов'язкове текстове поле (ПІБ або група)"
                             .formatted(lineNumber));
         }
 
         try {
-            double average = Double.parseDouble(fields[2].trim());
-            int course = Integer.parseInt(fields[3].trim());
+            int course = Integer.parseInt(fields[2].trim());
+            double average = Double.parseDouble(fields[3].trim());
 
-            if (Double.isNaN(average) || Double.isInfinite(average) || average < 0.0) {
-                return Optional.of(
-                        "Рядок %d: середній бал не може бути від'ємним".formatted(lineNumber));
-            }
             if (course <= 0) {
                 return Optional.of(
                         "Рядок %d: номер курсу має бути додатним цілим числом"
                                 .formatted(lineNumber));
+            }
+            if (Double.isNaN(average) || Double.isInfinite(average) || average < 0.0) {
+                return Optional.of(
+                        "Рядок %d: середній бал не може бути від'ємним".formatted(lineNumber));
             }
         } catch (NumberFormatException exception) {
             return Optional.of(

@@ -1,32 +1,26 @@
-
 package ua.lpnu.kzp;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-/**
- * Tests CSV file reading functionality.
- */
 class CsvReaderTest {
 
-    /**
-     * Checks that all six records are read from the input CSV file.
-     *
-     * @throws IOException if the input file cannot be read
-     */
     @Test
-    void readsAllLinesFromInputFile() throws IOException {
-        Path input = Path.of("data", "input.csv");
+    void readLinesPreservesUkrainianUtf8Text(@TempDir Path tempDir) throws IOException {
+        Path csvFile = tempDir.resolve("students.csv");
+        List<String> expected = List.of(
+                "Іван Петренко;КІ-301;3;87.5;true",
+                "Марія Коваль;КІ-302;3;92.0;false");
+        Files.write(csvFile, expected, StandardCharsets.UTF_8);
 
-        List<String> lines = CsvReader.readLines(input);
-
-        assertEquals(6, lines.size());
-        assertTrue(lines.get(0).contains("Іван Петренко"));
+        List<String> actual = CsvReader.readLines(csvFile);
+        assertEquals(expected, actual);
     }
 }

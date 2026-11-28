@@ -36,7 +36,7 @@ public final class StudentReportService {
     /**
      * Computes the four Variant 6 metrics from validated CSV lines.
      *
-     * @param validLines list of validated records in format {@code group;name;average;course;scholarship}
+     * @param validLines list of validated records in format {@code name;group;course;average;scholarship}
      * @return computed {@link StudentMetrics}
      */
     public static StudentMetrics calculate(List<String> validLines) {
@@ -49,7 +49,7 @@ public final class StudentReportService {
 
         for (String line : validLines) {
             String[] fields = line.split(DELIMITER, -1);
-            double score = Double.parseDouble(fields[2].trim());
+            double score = Double.parseDouble(fields[3].trim());
             boolean scholarship = Boolean.parseBoolean(fields[4].trim());
 
             validCount++;

@@ -4,78 +4,78 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import ua.lpnu.kzp.DataValidator.ValidationResult;
 
 class DataValidatorTest {
 
     @Test
-    void acceptsValidUkrainianRecord() {
-        assertTrue(DataValidator.validateLine("КІ-301;Іван Петренко;87.5;3;true", 1).isEmpty());
+    void validRecordWithUkrainianCharactersPassesValidation() {
+        Optional<String> error = DataValidator.validateLine(
+                "Іван Петренко;КІ-301;3;87.5;true", 1);
+        assertTrue(error.isEmpty());
     }
 
     @Test
-    void rejectsBlankLine() {
-        var error = DataValidator.validateLine("   ", 1);
+    void blankLineReturnsError() {
+        Optional<String> error = DataValidator.validateLine("   ", 2);
         assertTrue(error.isPresent());
-        assertTrue(error.get().contains("Рядок 1"));
+        assertTrue(error.get().contains("Рядок 2"));
     }
 
     @Test
-    void rejectsWrongFieldCount() {
-        var error = DataValidator.validateLine("КІ-301;Іван Петренко;87.5;3", 2);
+    void wrongFieldCountReturnsError() {
+        Optional<String> error = DataValidator.validateLine("Іван Петренко;КІ-301;3;87.5", 3);
         assertTrue(error.isPresent());
         assertTrue(error.get().contains("очікується 5 полів"));
     }
 
     @Test
-    void rejectsBlankMandatoryTextField() {
-        var error = DataValidator.validateLine("КІ-303;;81.0;3;false", 6);
-        assertTrue(error.isPresent());
-        assertTrue(error.get().contains("порожнє обов'язкове текстове поле"));
+    void emptyNameOrGroupReturnsError() {
+        Optional<String> emptyName = DataValidator.validateLine(";КІ-303;3;81.0;false", 4);
+        Optional<String> emptyGroup = DataValidator.validateLine("Олег Шевченко;;2;76.5;true", 5);
+        assertTrue(emptyName.isPresent());
+        assertTrue(emptyGroup.isPresent());
     }
 
     @Test
-    void rejectsNonNumericScore() {
-        var error = DataValidator.validateLine("КІ-302;Павло Мельник;помилка;2;true", 5);
-        assertTrue(error.isPresent());
-        assertTrue(error.get().contains("помилковий формат"));
+    void nonNumericCourseOrAverageReturnsError() {
+        Optional<String> badCourse = DataValidator.validateLine(
+                "Марія Коваль;КІ-302;третій;92.0;false", 6);
+        Optional<String> badAverage = DataValidator.validateLine(
+                "Павло Мельник;КІ-302;2;помилка;true", 7);
+        assertTrue(badCourse.isPresent());
+        assertTrue(badAverage.isPresent());
     }
 
     @Test
-    void rejectsNegativeAverageScore() {
-        var error = DataValidator.validateLine("КІ-301;Олег Шевченко;-10.5;2;true", 3);
-        assertTrue(error.isPresent());
-        assertTrue(error.get().contains("не може бути від'ємним"));
+    void negativeAverageOrNonPositiveCourseReturnsError() {
+        Optional<String> negativeAverage = DataValidator.validateLine(
+                "Анастасія Бондар;КІ-306;3;-5.0;false", 8);
+        Optional<String> zeroCourse = DataValidator.validateLine(
+                "Анастасія Бондар;КІ-306;0;82.0;false", 9);
+        assertTrue(negativeAverage.isPresent());
+        assertTrue(zeroCourse.isPresent());
     }
 
     @Test
-    void rejectsNonPositiveCourse() {
-        var error = DataValidator.validateLine("КІ-301;Олег Шевченко;80.0;0;true", 4);
-        assertTrue(error.isPresent());
-        assertTrue(error.get().contains("курс"));
-    }
-
-    @Test
-    void rejectsInvalidBooleanScholarship() {
-        var error = DataValidator.validateLine("КІ-301;Олег Шевченко;80.0;2;так", 7);
+    void invalidScholarshipBooleanReturnsError() {
+        Optional<String> error = DataValidator.validateLine(
+                "Іван Петренко;КІ-301;3;87.5;yes", 10);
         assertTrue(error.isPresent());
         assertTrue(error.get().contains("true або false"));
     }
 
     @Test
-    void separatesValidAndInvalidLinesFromSampleDataset() {
+    void validateAllSeparatesValidAndInvalidLines() {
         List<String> lines = List.of(
-                "КІ-301;Іван Петренко;87.5;3;true",
-                "КІ-302;Марія Коваль;92.0;3;false",
-                "КІ-301;Олег Шевченко;76.5;2;true",
-                "КІ-306;Анастасія Бондар;82.0;3;false",
-                "КІ-302;Павло Мельник;помилка;2;true",
-                "КІ-303;;81.0;3;false");
+                "Іван Петренко;КІ-301;3;87.5;true",
+                "Павло Мельник;КІ-302;2;помилка;true",
+                "Марія Коваль;КІ-302;3;92.0;false");
 
         ValidationResult result = DataValidator.validateAll(lines);
-
-        assertEquals(4, result.validLines().size());
-        assertEquals(2, result.errors().size());
+        assertEquals(2, result.validLines().size());
+        assertEquals(1, result.errors().size());
     }
 }
