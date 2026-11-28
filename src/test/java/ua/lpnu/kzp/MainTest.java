@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -37,10 +38,10 @@ class MainTest {
 
         assertTrue(Files.exists(output));
         String report = Files.readString(output, StandardCharsets.UTF_8);
-        assertTrue(report.contains("Коректних записів:          2"));
-        assertTrue(report.contains("Середній бал:            89.75"));
-        assertTrue(report.contains("Найбільший бал:          92.00"));
-        assertTrue(report.contains("Кількість стипендіатів:     1"));
+        assertTrue(report.contains(String.format(Locale.ROOT, "%-28s %10d", "Коректних записів:", 2)));
+        assertTrue(report.contains(String.format(Locale.ROOT, "%-28s %10.2f", "Середній бал:", 89.75)));
+        assertTrue(report.contains(String.format(Locale.ROOT, "%-28s %10.2f", "Найбільший бал:", 92.00)));
+        assertTrue(report.contains(String.format(Locale.ROOT, "%-28s %10d", "Кількість стипендіатів:", 1)));
         assertTrue(report.contains("Помилок обробки: 1"));
     }
 }

@@ -8,7 +8,7 @@ import ua.lpnu.kzp.DataValidator.ValidationResult;
 import ua.lpnu.kzp.StudentReportService.StudentMetrics;
 
 /**
- * Entry point of the KZP Laboratory 1 console application (Variant 6: Student Registry).
+ * Entry point of the KZP console application (Variant 6: Student Registry).
  */
 public final class Main {
 
@@ -19,8 +19,8 @@ public final class Main {
     }
 
     /**
-     * Parses CLI arguments, reads input records, validates them, computes metrics,
-     * and outputs the report to both the console and the destination file.
+     * Parses CLI arguments, reads input records, converts them into {@link Student} entities,
+     * computes metrics, and outputs the report to both the console and the destination file.
      *
      * @param args command-line arguments
      */
@@ -76,7 +76,7 @@ public final class Main {
         try {
             List<String> rawLines = CsvReader.readLines(inputPath);
             ValidationResult validation = DataValidator.validateAll(rawLines);
-            StudentMetrics metrics = StudentReportService.calculate(validation.validLines());
+            StudentMetrics metrics = StudentReportService.calculate(validation.validStudents());
             String report = StudentReportService.formatReport(metrics, validation.errors());
 
             System.out.printf(Locale.ROOT, "%s", report);
@@ -92,7 +92,7 @@ public final class Main {
 
     private static void printHelp() {
         System.out.printf(
-                "Використання: java -jar target/lab01-1.0.0.jar [--help] [--version] [--input <файл>] [--output <файл>]%n"
+                "Використання: java -jar target/lab01-1.1.0.jar [--help] [--version] [--input <файл>] [--output <файл>]%n"
                         + "  --help             показати довідку%n"
                         + "  --version          вивести версію програми та номер збірки%n"
                         + "  --input <файл>     шлях до вхідного CSV-файла (за замовчуванням: data/input.csv)%n"

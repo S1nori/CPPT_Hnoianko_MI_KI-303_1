@@ -36,13 +36,13 @@ jobs:
 
       - name: Smoke check packaged JAR
         run: |
-          java -jar target/lab01-1.0.0.jar --version
-          java -jar target/lab01-1.0.0.jar --help
+          java -jar target/lab01-1.1.0.jar --version
+          java -jar target/lab01-1.1.0.jar --help
 
       - name: Upload JAR artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: jar-${{ matrix.os }}-${{ github.run_number }}
-          path: target/lab01-1.0.0.jar
+          path: target/lab01-1.1.0.jar
           if-no-files-found: error
