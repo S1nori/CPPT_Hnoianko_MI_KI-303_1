@@ -42,7 +42,7 @@
 * `.\mvnw.cmd clean verify package` — успішна компіляція (Java 21), 21/21 тестів JUnit 5, перевірка байт-коду SpotBugs (`0 errors`) та пакування `target/lab01-1.1.0.jar`.
 * `java -jar target/lab01-1.1.0.jar --version` — виводить `1.1.0+local` (у GitHub Actions — `1.1.0+<run_number>`).
 * **Git-тег версії:** `v1.1.0`.
-* **Посилання на запуск GitHub Actions та JAR-артефакти:** `<вставити посилання на workflow run після push>`.
+* **Посилання на запуск GitHub Actions та JAR-артефакти:** `https://github.com/S1nori/CPPT_Hnoianko_MI_KI-303_1/actions/runs/46165741568`.
 
 ## 8. GitHub Issues і Pull Request
 | № Issue | Назва задачі | Внесена зміна | Статус перевірки |
